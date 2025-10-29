@@ -1,89 +1,177 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
-
-const REDIRECT_URL = 'https://test.ru';
-const API_URL = 'https://functions.poehali.dev/18327805-636e-40b4-8baf-c4bb7426aaa3';
+import { useNavigate } from 'react-router-dom';
 
 export default function Index() {
-  const [clicks, setClicks] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState(false);
+  const [userCount, setUserCount] = useState<number>(0);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [username, setUsername] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchClickCount();
+    fetchUserCount();
+    checkAuth();
   }, []);
 
-  const fetchClickCount = async () => {
+  const fetchUserCount = async () => {
     try {
-      const response = await fetch(API_URL);
+      const response = await fetch('YOUR_API_URL/user-count');
       const data = await response.json();
-      setClicks(data.clicks || 0);
+      setUserCount(data.count || 0);
     } catch (error) {
-      console.error('Error fetching clicks:', error);
+      console.error('Error fetching user count:', error);
     }
   };
 
-  const handleRedirect = async () => {
-    setIsLoading(true);
-    
-    try {
-      await fetch(API_URL, { method: 'POST' });
-      window.location.href = REDIRECT_URL;
-    } catch (error) {
-      console.error('Error recording click:', error);
-      window.location.href = REDIRECT_URL;
+  const checkAuth = () => {
+    const auth = localStorage.getItem('kick_auth');
+    if (auth) {
+      const userData = JSON.parse(auth);
+      setIsAuthenticated(true);
+      setUsername(userData.username);
     }
+  };
+
+  const handleKickAuth = async () => {
+    window.location.href = 'YOUR_API_URL/auth/kick';
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('kick_auth');
+    setIsAuthenticated(false);
+    setUsername(null);
+    fetchUserCount();
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-white via-gray-50 to-blue-50 p-4">
-      <div className="max-w-2xl w-full text-center space-y-12 animate-fade-in">
-        
-        <div className="space-y-4">
-          <h1 className="text-6xl font-bold text-foreground tracking-tight">
-            Переход
-          </h1>
-          <p className="text-xl text-muted-foreground font-light">
-            Нажмите кнопку для перехода на test.ru
-          </p>
-        </div>
-
-        <div className="flex flex-col items-center gap-8">
-          <Button
-            onClick={handleRedirect}
-            disabled={isLoading}
-            size="lg"
-            className="group relative h-20 px-12 text-xl font-semibold shadow-2xl hover:shadow-primary/50 transition-all duration-300 hover:scale-105 disabled:opacity-70 disabled:hover:scale-100"
-          >
-            <span className="flex items-center gap-3">
-              {isLoading ? (
-                <>
-                  <Icon name="Loader2" className="animate-spin" size={28} />
-                  Переход...
-                </>
-              ) : (
-                <>
-                  Перейти на test.ru
-                  <Icon name="ExternalLink" size={28} className="group-hover:translate-x-1 transition-transform" />
-                </>
-              )}
-            </span>
-          </Button>
-
-          <div className="flex flex-col items-center gap-3 p-8 bg-white/80 backdrop-blur-sm rounded-2xl border border-border shadow-lg min-w-[280px]">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Icon name="MousePointerClick" size={20} />
-              <span className="text-sm font-medium uppercase tracking-wider">Всего переходов</span>
+    <div className="min-h-screen bg-gradient-to-br from-black via-red-950/20 to-black relative overflow-hidden">
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNnoiIHN0cm9rZT0iI2ZmZDcwMCIgc3Ryb2tlLW9wYWNpdHk9IjAuMDUiLz48L2c+PC9zdmc+')] opacity-30"></div>
+      
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
+      
+      <div className="relative z-10 container mx-auto px-4 min-h-screen flex flex-col">
+        <header className="py-6 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center font-bold text-2xl shadow-lg shadow-primary/50">
+              V
             </div>
-            <div className="text-6xl font-bold text-primary tabular-nums">
-              {clicks.toLocaleString('ru-RU')}
+            <div>
+              <h1 className="text-2xl font-bold text-primary">VLADICH</h1>
+              <p className="text-xs text-muted-foreground">Casino Streamer</p>
             </div>
           </div>
-        </div>
 
-        <div className="pt-8 text-sm text-muted-foreground/60 font-light">
-          Каждый клик учитывается в реальном времени
-        </div>
+          <div className="flex items-center gap-4">
+            <div className="bg-card/50 backdrop-blur-sm px-6 py-3 rounded-lg border border-primary/20">
+              <div className="flex items-center gap-2">
+                <Icon name="Users" size={18} className="text-primary" />
+                <span className="text-sm text-muted-foreground">Пользователей:</span>
+                <span className="text-xl font-bold text-primary">{userCount}</span>
+              </div>
+            </div>
+
+            {isAuthenticated ? (
+              <div className="flex items-center gap-3">
+                <div className="bg-primary/10 px-4 py-2 rounded-lg border border-primary/30">
+                  <span className="text-sm text-primary font-medium">{username}</span>
+                </div>
+                <Button
+                  onClick={handleLogout}
+                  variant="outline"
+                  size="sm"
+                  className="border-secondary/50 hover:bg-secondary/20"
+                >
+                  <Icon name="LogOut" size={16} />
+                </Button>
+              </div>
+            ) : (
+              <Button
+                onClick={handleKickAuth}
+                className="bg-gradient-to-r from-primary to-yellow-500 hover:from-primary/90 hover:to-yellow-500/90 text-black font-semibold shadow-lg shadow-primary/50"
+              >
+                <Icon name="UserPlus" size={18} />
+                Войти через Kick
+              </Button>
+            )}
+          </div>
+        </header>
+
+        <main className="flex-1 flex flex-col items-center justify-center py-12 space-y-16">
+          <div className="text-center space-y-6 max-w-3xl">
+            <div className="inline-block animate-pulse">
+              <div className="text-8xl mb-4">🎰</div>
+            </div>
+            <h2 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-primary via-yellow-400 to-secondary bg-clip-text text-transparent">
+              VLADICH CASINO
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              Официальное сообщество стримера vladich
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-6 w-full max-w-2xl px-4">
+            <Button
+              onClick={() => window.open('https://kick.com/vladich', '_blank')}
+              size="lg"
+              className="group relative h-20 flex-1 bg-gradient-to-br from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-bold text-xl shadow-2xl shadow-green-500/30 border-2 border-green-400/50 transition-all duration-300 hover:scale-105"
+            >
+              <span className="flex items-center gap-3">
+                <Icon name="Video" size={28} />
+                Kick
+                <Icon name="ExternalLink" size={20} className="opacity-70 group-hover:translate-x-1 transition-transform" />
+              </span>
+            </Button>
+
+            <Button
+              onClick={() => window.open('https://t.me/vladich_community', '_blank')}
+              size="lg"
+              className="group relative h-20 flex-1 bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold text-xl shadow-2xl shadow-blue-500/30 border-2 border-blue-400/50 transition-all duration-300 hover:scale-105"
+            >
+              <span className="flex items-center gap-3">
+                <Icon name="Send" size={28} />
+                Telegram
+                <Icon name="ExternalLink" size={20} className="opacity-70 group-hover:translate-x-1 transition-transform" />
+              </span>
+            </Button>
+
+            <Button
+              onClick={() => navigate('/clips')}
+              size="lg"
+              className="group relative h-20 flex-1 bg-gradient-to-br from-primary to-yellow-500 hover:from-primary/90 hover:to-yellow-500/90 text-black font-bold text-xl shadow-2xl shadow-primary/50 border-2 border-primary/50 transition-all duration-300 hover:scale-105"
+            >
+              <span className="flex items-center gap-3">
+                <Icon name="Film" size={28} />
+                Нарезки
+                <Icon name="ChevronRight" size={24} className="group-hover:translate-x-1 transition-transform" />
+              </span>
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl px-4 mt-12">
+            <div className="bg-card/30 backdrop-blur-sm p-6 rounded-xl border border-primary/20 text-center space-y-2 hover:border-primary/40 transition-all">
+              <Icon name="TrendingUp" size={32} className="text-primary mx-auto" />
+              <div className="text-3xl font-bold text-foreground">24/7</div>
+              <p className="text-sm text-muted-foreground">Стримы каждый день</p>
+            </div>
+            
+            <div className="bg-card/30 backdrop-blur-sm p-6 rounded-xl border border-primary/20 text-center space-y-2 hover:border-primary/40 transition-all">
+              <Icon name="DollarSign" size={32} className="text-primary mx-auto" />
+              <div className="text-3xl font-bold text-foreground">SLOTS</div>
+              <p className="text-sm text-muted-foreground">Лучшие слоты</p>
+            </div>
+            
+            <div className="bg-card/30 backdrop-blur-sm p-6 rounded-xl border border-primary/20 text-center space-y-2 hover:border-primary/40 transition-all">
+              <Icon name="Flame" size={32} className="text-primary mx-auto" />
+              <div className="text-3xl font-bold text-foreground">HOT</div>
+              <p className="text-sm text-muted-foreground">Горячие заносы</p>
+            </div>
+          </div>
+        </main>
+
+        <footer className="py-6 text-center text-sm text-muted-foreground border-t border-border/50">
+          <p>© 2024 VLADICH CASINO. Играй ответственно 18+</p>
+        </footer>
       </div>
     </div>
   );
