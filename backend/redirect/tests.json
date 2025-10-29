@@ -1,0 +1,16 @@
+{
+  "tests": [
+    {
+      "name": "Get click count",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Record click",
+      "method": "POST",
+      "path": "/",
+      "expectedStatus": 200
+    }
+  ]
+}
