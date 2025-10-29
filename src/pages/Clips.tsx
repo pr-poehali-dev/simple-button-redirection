@@ -27,7 +27,7 @@ export default function Clips() {
 
   const fetchClips = async () => {
     try {
-      const response = await fetch('YOUR_API_URL/clips');
+      const response = await fetch('https://functions.poehali.dev/b36a01b0-7b82-4974-bb30-47e407497b45');
       const data = await response.json();
       setClips(data.clips || []);
     } catch (error) {
@@ -49,7 +49,7 @@ export default function Clips() {
 
     setIsLoading(true);
     try {
-      const response = await fetch('YOUR_API_URL/clips', {
+      const response = await fetch('https://functions.poehali.dev/b36a01b0-7b82-4974-bb30-47e407497b45', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: newUrl, title: newTitle })
@@ -69,7 +69,7 @@ export default function Clips() {
 
   const handleDeleteClip = async (id: string) => {
     try {
-      await fetch(`YOUR_API_URL/clips/${id}`, { method: 'DELETE' });
+      await fetch(`https://functions.poehali.dev/b36a01b0-7b82-4974-bb30-47e407497b45/${id}`, { method: 'DELETE' });
       fetchClips();
     } catch (error) {
       console.error('Error deleting clip:', error);

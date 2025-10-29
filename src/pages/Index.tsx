@@ -16,7 +16,7 @@ export default function Index() {
 
   const fetchUserCount = async () => {
     try {
-      const response = await fetch('YOUR_API_URL/user-count');
+      const response = await fetch('https://functions.poehali.dev/90a90c4a-40c9-41af-af24-115e95643a7d');
       const data = await response.json();
       setUserCount(data.count || 0);
     } catch (error) {
